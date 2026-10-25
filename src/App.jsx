@@ -147,9 +147,7 @@ export default function App() {
         aria-labelledby="registration-title"
       >
         <h1 id="registration-title" className="registration-title">
-          Student
-          <br />
-          Registration Form
+          Student Registration Form
         </h1>
 
         <form onSubmit={handleSubmit} noValidate>
