@@ -11,29 +11,37 @@ const initialFormData = {
 
 function validateForm(values) {
   const nextErrors = {};
+  const normalizedValues = {
+    name: values.name ?? "",
+    username: values.username ?? "",
+    college: values.college ?? "",
+    email: values.email ?? "",
+    password: values.password ?? "",
+    address: values.address ?? "",
+  };
 
-  if (!values.name.trim()) {
+  if (!normalizedValues.name.trim()) {
     nextErrors.name = "Name is required";
   }
 
-  if (values.username !== values.username.toLowerCase()) {
+  if (/[A-Z]/.test(normalizedValues.username)) {
     nextErrors.username = "Username must be lowercase only";
   }
 
-  if (!values.college.trim()) {
+  if (!normalizedValues.college.trim()) {
     nextErrors.college = "College is required";
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(values.email.trim())) {
+  if (!emailPattern.test(normalizedValues.email.trim())) {
     nextErrors.email = "Enter a valid email address";
   }
 
-  if (values.password.length < 8) {
+  if (normalizedValues.password.length < 8) {
     nextErrors.password = "Password must be at least 8 characters";
   }
 
-  if (!values.address.trim()) {
+  if (!normalizedValues.address.trim()) {
     nextErrors.address = "Address is required";
   }
 
@@ -100,12 +108,22 @@ export default function App() {
 
     if (hasSubmitted) {
       setErrors(validateForm(nextFormData));
-    } else if (errors[name]) {
-      setErrors((currentErrors) => ({
-        ...currentErrors,
-        [name]: validateForm(nextFormData)[name],
-      }));
+      return;
     }
+
+    const nextFieldError = validateForm(nextFormData)[name];
+
+    setErrors((currentErrors) => {
+      if (!nextFieldError) {
+        const { [name]: _removedError, ...remainingErrors } = currentErrors;
+        return remainingErrors;
+      }
+
+      return {
+        ...currentErrors,
+        [name]: nextFieldError,
+      };
+    });
   }
 
   function handleSubmit(event) {
